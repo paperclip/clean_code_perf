@@ -114,6 +114,12 @@ int main(int argc, char* argv[])
         bench.run("MultiCollection", [&]() {
             doNotOptimizeAway(shapes.TotalArea());
         });
+        bench.run("MultiCollectionTemplate", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaTemplate());
+        });
+        bench.run("MultiCollectionTemplateParallel", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaTemplateParallel());
+        });
     }
     {
         auto shapes = CachedShapeCollection(seed, countShapes);

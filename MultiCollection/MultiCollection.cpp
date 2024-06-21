@@ -33,7 +33,23 @@ MultiCollection::MultiCollection(int seed, u32 shapeCount)
             default:
                 throw std::invalid_argument("Bad random shape");
         }
-    }}
+    }
+}
+
+namespace
+{
+    template<class T>
+    param_type sum(const std::vector<T>& shapes)
+    {
+        param_type result = 0.0;
+        for (const auto& shape : shapes)
+        {
+            result += shape.Area();
+        }
+        return result;
+    }
+}
+
 param_type MultiCollection::TotalArea()
 {
     param_type result = 0.0;
@@ -54,4 +70,24 @@ param_type MultiCollection::TotalArea()
         result += shape.Area();
     }
     return result;
+}
+
+param_type MultiCollection::TotalAreaTemplate()
+{
+    param_type result = 0.0;
+    result += sum(m_squares);
+    result += sum(m_rectangles);
+    result += sum(m_triangles);
+    result += sum(m_circles);
+    return result;
+}
+
+
+param_type MultiCollection::TotalAreaTemplateParallel()
+{
+    auto ret1 = sum(m_squares);
+    auto ret2 = sum(m_rectangles);
+    auto ret3 = sum(m_triangles);
+    auto ret4 = sum(m_circles);
+    return ret1 + ret2 + ret3 + ret4;
 }

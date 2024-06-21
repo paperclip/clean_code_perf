@@ -10,6 +10,8 @@ class MultiCollection
 public:
     MultiCollection(int seed, u32 shapeCount);
     param_type TotalArea();
+    param_type TotalAreaTemplate();
+    param_type TotalAreaTemplateParallel();
 private:
     std::vector<square> m_squares;
     std::vector<rectangle> m_rectangles;

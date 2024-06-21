@@ -3,7 +3,7 @@
 
 #include "../raw_virtual.h"
 
-f32 TotalAreaRawVector(const ShapeVector& shapes)
+f32 RawVectorShapes::TotalArea(const RawVectorShapes::ShapeVector& shapes)
 {
     param_type result = 0.0;
     for (const auto* shape : shapes)

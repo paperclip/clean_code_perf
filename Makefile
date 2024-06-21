@@ -11,6 +11,7 @@ SRCS := \
 	SwitchPtr/SwitchPtr.o \
 	Union/raw_union.o \
 	UnionTable/listing27.o \
+	UniqueVector/UniqueVector.o \
 	RawVectorShapes/VectorShapes.o
 
 test : $(SRCS)

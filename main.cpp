@@ -6,6 +6,7 @@
 #include "SwitchPtr/SwitchPtr.h"
 #include "Union/raw_union.h"
 #include "UnionTable/listing27.h"
+#include "UniqueVector/UniqueVector.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -22,6 +23,7 @@ int main(int argc, char* argv[])
     }
 
     constexpr int countShapes = 1048576;
+    using namespace ankerl::nanobench;
     auto bench = ankerl::nanobench::Bench();
     bench.batch(countShapes);
     bench.unit("shape");
@@ -33,11 +35,11 @@ int main(int argc, char* argv[])
 
         bench.relative(true);
         bench.run("TotalAreaVTBL", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes));
         });
 
         bench.run("TotalAreaVTBL4", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes));
         });
 
         RawVirtual::deleteShapes(shapes, countShapes);
@@ -46,16 +48,16 @@ int main(int argc, char* argv[])
     {
         auto shapes = RawUnion::createShapes(seed, countShapes);
         bench.run("TotalAreaSwitch", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitch(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaSwitch(countShapes, shapes));
         });
         bench.run("TotalAreaSwitch4", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitch4(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaSwitch4(countShapes, shapes));
         });
         bench.run("TotalAreaUnion", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaUnion(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaUnion(countShapes, shapes));
         });
         bench.run("TotalAreaUnion4", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaUnion4(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaUnion4(countShapes, shapes));
         });
         RawUnion::deleteShapes(shapes);
     }
@@ -63,10 +65,10 @@ int main(int argc, char* argv[])
         // Is all of the saving from using values not pointers?
         auto shapes = RawUnion::createShapePtrs(seed, countShapes);
         bench.run("TotalAreaSwitchPtr", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitchPtr(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaSwitchPtr(countShapes, shapes));
         });
         bench.run("TotalAreaSwitchPtr4", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitchPtr4(countShapes, shapes));
+            doNotOptimizeAway(TotalAreaSwitchPtr4(countShapes, shapes));
         });
 
         RawUnion::deleteShapes(shapes, countShapes);
@@ -74,10 +76,16 @@ int main(int argc, char* argv[])
     {
         auto shapes = RawVectorShapes::create(seed, countShapes);
         bench.run("TotalAreaRawVector", [&]() {
-            ankerl::nanobench::doNotOptimizeAway(TotalAreaRawVector(shapes));
+            doNotOptimizeAway(RawVectorShapes::TotalArea(shapes));
         });
 
         RawVectorShapes::destroy(shapes);
+    }
+    {
+        auto shapes = UniqueVector::create(seed, countShapes);
+        bench.run("TotalAreaUniqueVector", [&]() {
+            doNotOptimizeAway(UniqueVector::TotalArea(shapes));
+        });
     }
 
     return 0;

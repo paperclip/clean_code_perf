@@ -13,7 +13,7 @@ public:
     param_type TotalAreaAccumulate();
     param_type TotalAreaParallel();
 private:
-    using share_base_ptr = std::unique_ptr<shape_base>;
-    using ShapeVector = std::vector<share_base_ptr>;
+    using shape_base_ptr = std::unique_ptr<shape_base>;
+    using ShapeVector = std::vector<shape_base_ptr>;
     ShapeVector m_shapes;
 };

@@ -15,7 +15,8 @@ SRCS := \
 	UnionTable/listing27.o \
 	UniqueVector/UniqueVector.o \
 	VariantCollection/VariantCollection.o \
-	RawVectorShapes/VectorShapes.o 
+	RawVectorShapes/VectorShapes.o \
+	MultiCollection/MultiCollection.o
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@"
@@ -23,7 +24,10 @@ test : $(SRCS)
 %.o : %.cpp
 	g++ -DSFMT_MEXP=19937 -g -O3 -c $< -o $@
 
+%.o : %.c
+	gcc -DSFMT_MEXP=19937 -g -O3 -c $< -o $@
+
 clean :
-	rm -f test *.o
+	rm -f test *.o */*.o
 
 .PHONY : clean

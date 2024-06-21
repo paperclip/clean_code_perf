@@ -14,7 +14,7 @@ ShapeCollection::ShapeCollection(int seed, u32 shapeCount)
     m_shapes.reserve(shapeCount);
     for (auto i=0; i<shapeCount; i++)
     {
-        share_base_ptr shape{RawVirtual::createShape(r)};
+        shape_base_ptr shape{RawVirtual::createShape(r)};
         m_shapes.push_back(std::move(shape));
     }
 }
@@ -31,7 +31,7 @@ param_type ShapeCollection::TotalArea()
 
 param_type ShapeCollection::TotalAreaAccumulate()
 {
-    auto area_fold = [](param_type acc, const share_base_ptr& value)
+    auto area_fold = [](param_type acc, const shape_base_ptr& value)
     {
         return acc + value->Area();
     };
@@ -42,7 +42,7 @@ param_type ShapeCollection::TotalAreaParallel()
 {
     std::vector<param_type> areas;
     areas.reserve(m_shapes.size());
-    auto get_area = [](const share_base_ptr& value) -> param_type
+    auto get_area = [](const shape_base_ptr& value) -> param_type
     {
         return value->Area();
     };

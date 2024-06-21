@@ -10,6 +10,7 @@
 #include "UnionTable/listing27.h"
 #include "UniqueVector/UniqueVector.h"
 #include "VariantCollection/VariantCollection.h"
+#include "MultiCollection/MultiCollection.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -105,6 +106,12 @@ int main(int argc, char* argv[])
     {
         auto shapes = VariantCollection(seed, countShapes);
         bench.run("Variant Collection", [&]() {
+            doNotOptimizeAway(shapes.TotalArea());
+        });
+    }
+    {
+        auto shapes = MultiCollection(seed, countShapes);
+        bench.run("MultiCollection", [&]() {
             doNotOptimizeAway(shapes.TotalArea());
         });
     }

@@ -3,6 +3,7 @@
 #include "listing24.h"
 #include "RawVectorShapes/VectorShapes.h"
 #include "Switch/listing25.h"
+#include "SwitchPtr/SwitchPtr.h"
 #include "Union/raw_union.h"
 #include "UnionTable/listing27.h"
 
@@ -57,6 +58,18 @@ int main(int argc, char* argv[])
             ankerl::nanobench::doNotOptimizeAway(TotalAreaUnion4(countShapes, shapes));
         });
         RawUnion::deleteShapes(shapes);
+    }
+    {
+        // Is all of the saving from using values not pointers?
+        auto shapes = RawUnion::createShapePtrs(seed, countShapes);
+        bench.run("TotalAreaSwitchPtr", [&]() {
+            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitchPtr(countShapes, shapes));
+        });
+        bench.run("TotalAreaSwitchPtr4", [&]() {
+            ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitchPtr4(countShapes, shapes));
+        });
+
+        RawUnion::deleteShapes(shapes, countShapes);
     }
     {
         auto shapes = RawVectorShapes::create(seed, countShapes);

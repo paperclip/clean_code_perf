@@ -2,6 +2,7 @@
 #include "listing23.h"
 #include "listing24.h"
 #include "RawVectorShapes/VectorShapes.h"
+#include "ShapeCollection/ShapeCollection.h"
 #include "Switch/listing25.h"
 #include "SwitchPtr/SwitchPtr.h"
 #include "Union/raw_union.h"
@@ -75,7 +76,7 @@ int main(int argc, char* argv[])
     }
     {
         auto shapes = RawVectorShapes::create(seed, countShapes);
-        bench.run("TotalAreaRawVector", [&]() {
+        bench.run("RawVector", [&]() {
             doNotOptimizeAway(RawVectorShapes::TotalArea(shapes));
         });
 
@@ -83,8 +84,14 @@ int main(int argc, char* argv[])
     }
     {
         auto shapes = UniqueVector::create(seed, countShapes);
-        bench.run("TotalAreaUniqueVector", [&]() {
+        bench.run("UniqueVector", [&]() {
             doNotOptimizeAway(UniqueVector::TotalArea(shapes));
+        });
+    }
+    {
+        auto shapes = ShapeCollection(seed, countShapes);
+        bench.run("ShapeCollection", [&]() {
+            doNotOptimizeAway(shapes.TotalArea());
         });
     }
 

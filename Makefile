@@ -7,6 +7,7 @@ SRCS := \
 	random.o \
 	raw_virtual.o \
 	mt/SFMT.o \
+	ShapeCollection/ShapeCollection.o \
 	Switch/listing25.o \
 	SwitchPtr/SwitchPtr.o \
 	Union/raw_union.o \

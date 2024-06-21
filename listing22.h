@@ -6,11 +6,6 @@
 
 #include "shape_type.h"
 
-#include <cstdint>
-
-using u32 = uint32_t;
-constexpr param_type Pi32 = 3.14;
-
 class shape_base
 {
 public:

@@ -9,13 +9,14 @@ SRCS := \
 	mt/SFMT.o \
 	Switch/listing25.o \
 	Union/raw_union.o \
-	UnionTable/listing27.o
+	UnionTable/listing27.o \
+	RawVectorShapes/VectorShapes.o
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@"
 
 %.o : %.cpp
-	g++ -g -O3 -c $< -o $@
+	g++ -DSFMT_MEXP=19937 -g -O3 -c $< -o $@
 
 clean :
 	rm -f test *.o

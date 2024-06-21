@@ -1,6 +1,7 @@
 
 #include "listing23.h"
 #include "listing24.h"
+#include "RawVectorShapes/VectorShapes.h"
 #include "Switch/listing25.h"
 #include "Union/raw_union.h"
 #include "UnionTable/listing27.h"
@@ -27,7 +28,7 @@ int main(int argc, char* argv[])
     
 
     {
-        shape_base** shapes = RawVirtual::createShapes(seed, countShapes);
+        auto shapes = RawVirtual::createShapes(seed, countShapes);
 
         bench.relative(true);
         bench.run("TotalAreaVTBL", [&]() {
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
     }
 
     {
-        shape_union* shapes = RawUnion::createShapes(seed, countShapes);
+        auto shapes = RawUnion::createShapes(seed, countShapes);
         bench.run("TotalAreaSwitch", [&]() {
             ankerl::nanobench::doNotOptimizeAway(TotalAreaSwitch(countShapes, shapes));
         });
@@ -56,6 +57,14 @@ int main(int argc, char* argv[])
             ankerl::nanobench::doNotOptimizeAway(TotalAreaUnion4(countShapes, shapes));
         });
         RawUnion::deleteShapes(shapes);
+    }
+    {
+        auto shapes = RawVectorShapes::create(seed, countShapes);
+        bench.run("TotalAreaRawVector", [&]() {
+            ankerl::nanobench::doNotOptimizeAway(TotalAreaRawVector(shapes));
+        });
+
+        RawVectorShapes::destroy(shapes);
     }
 
     return 0;

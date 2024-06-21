@@ -8,12 +8,14 @@ SRCS := \
 	raw_virtual.o \
 	mt/SFMT.o \
 	ShapeCollection/ShapeCollection.o \
+	CachedShapeCollection/CachedShapeCollection.o \
 	Switch/listing25.o \
 	SwitchPtr/SwitchPtr.o \
 	Union/raw_union.o \
 	UnionTable/listing27.o \
 	UniqueVector/UniqueVector.o \
-	RawVectorShapes/VectorShapes.o
+	VariantCollection/VariantCollection.o \
+	RawVectorShapes/VectorShapes.o 
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@"

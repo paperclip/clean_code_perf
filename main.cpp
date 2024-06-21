@@ -1,6 +1,7 @@
 
 #include "listing23.h"
 #include "listing24.h"
+#include "CachedShapeCollection/CachedShapeCollection.h"
 #include "RawVectorShapes/VectorShapes.h"
 #include "ShapeCollection/ShapeCollection.h"
 #include "Switch/listing25.h"
@@ -8,6 +9,7 @@
 #include "Union/raw_union.h"
 #include "UnionTable/listing27.h"
 #include "UniqueVector/UniqueVector.h"
+#include "VariantCollection/VariantCollection.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -23,12 +25,12 @@ int main(int argc, char* argv[])
 	    seed = strtol(argv[1], NULL, 10);
     }
 
-    constexpr int countShapes = 1048576;
+    constexpr int countShapes = 1048576 * 2;
     using namespace ankerl::nanobench;
     auto bench = ankerl::nanobench::Bench();
     bench.batch(countShapes);
     bench.unit("shape");
-    bench.minEpochIterations(10);
+    bench.minEpochIterations(5);
     
 
     {
@@ -90,7 +92,25 @@ int main(int argc, char* argv[])
     }
     {
         auto shapes = ShapeCollection(seed, countShapes);
-        bench.run("ShapeCollection", [&]() {
+        bench.run("Shape Collection", [&]() {
+            doNotOptimizeAway(shapes.TotalArea());
+        });
+        bench.run("Accumulate", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaAccumulate());
+        });
+        bench.run("Transform Parallel", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaParallel());
+        });
+    }
+    {
+        auto shapes = VariantCollection(seed, countShapes);
+        bench.run("Variant Collection", [&]() {
+            doNotOptimizeAway(shapes.TotalArea());
+        });
+    }
+    {
+        auto shapes = CachedShapeCollection(seed, countShapes);
+        bench.run("Cached Collection", [&]() {
             doNotOptimizeAway(shapes.TotalArea());
         });
     }

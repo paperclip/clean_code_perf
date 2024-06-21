@@ -29,6 +29,9 @@ namespace RawVectorShapes
     }
     void destroy(ShapeVector& shapes)
     {
-
+        for (auto* shape : shapes)
+        {
+            delete shape;
+        }
     }
 }

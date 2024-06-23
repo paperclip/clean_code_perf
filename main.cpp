@@ -11,6 +11,7 @@
 #include "UniqueVector/UniqueVector.h"
 #include "VariantCollection/VariantCollection.h"
 #include "MultiCollection/MultiCollection.h"
+#include "SortedCollection/SortedCollection.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -119,6 +120,12 @@ int main(int argc, char* argv[])
         });
         bench.run("MultiCollectionTemplateParallel", [&]() {
             doNotOptimizeAway(shapes.TotalAreaTemplateParallel());
+        });
+    }
+    {
+        auto shapes = Sorted::SortedCollection(seed, countShapes);
+        bench.run("SortedCollection", [&]() {
+            doNotOptimizeAway(shapes.TotalArea());
         });
     }
     {

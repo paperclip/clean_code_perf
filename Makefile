@@ -16,16 +16,19 @@ SRCS := \
 	UniqueVector/UniqueVector.o \
 	VariantCollection/VariantCollection.o \
 	RawVectorShapes/VectorShapes.o \
-	MultiCollection/MultiCollection.o
+	MultiCollection/MultiCollection.o \
+	SortedCollection/SortedCollection.o
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@"
 
+FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
+
 %.o : %.cpp
-	g++ -DSFMT_MEXP=19937 -g -O3 -c $< -o $@
+	g++ $(FLAGS) -c $< -o $@
 
 %.o : %.c
-	gcc -DSFMT_MEXP=19937 -g -O3 -c $< -o $@
+	gcc $(FLAGS) -O3 -c $< -o $@
 
 clean :
 	rm -f test *.o */*.o

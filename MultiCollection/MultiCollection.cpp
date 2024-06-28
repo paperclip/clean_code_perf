@@ -114,9 +114,12 @@ namespace
                 : m_shapes(x.m_shapes), m_result(0)
             {}
 
-            SumShapes(const ShapeVector& shapes)
+            explicit SumShapes(const ShapeVector& shapes)
                 : m_shapes(shapes), m_result(0)
             {}
+
+            SumShapes(const SumShapes&) = delete;
+            SumShapes(SumShapes&&) = delete;
             
             const ShapeVector& m_shapes;
             param_type m_result;

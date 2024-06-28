@@ -3,6 +3,10 @@
 
 #include <cstdint>
 
+#if __has_include(<tbb/parallel_reduce.h>)
+# define HAVE_TBB 
+#endif
+
 enum shape_type
 {
     SQUARE = 0,

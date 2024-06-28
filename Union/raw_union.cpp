@@ -2,27 +2,63 @@
 
 #include "../random.h"
 
+#include <iostream>
+
+#define PRINT(x)  std::cerr << x << '\n'
+
 shape_union* RawUnion::createShapes(int seed, u32 countShapes)
 {
     shape_union* shapes = new shape_union[countShapes];
     
     Randomizer r{seed};
+    bool print = false;
 
     for (int i=0; i<countShapes; i++)
     {
+        shape_union& shape = shapes[i];
         auto t = r.randomShapeType();
-        shapes[i].Type = t;
+        shape.Type = t;
+        auto p1 = r.randomParam();
+        shape.Width = p1;
 
         switch(t)
         {
             case SQUARE:
-            case CIRCLE:
-                shapes[i].Width = r.randomParam();
+                if (print)
+                {
+                    PRINT("square(" << p1 << ")");
+                }
+                shape.Height = shape.Width;
+                break;
+            case RECTANGLE:
+                if (print)
+                {
+                    PRINT("rectangle(" << p1 << ", ...)");
+                }
+                shape.Height = r.randomParam();
                 break;
             case TRIANGLE:
-                shapes[i].Width = r.randomParam();
-                shapes[i].Height = r.randomParam();
+                if (print)
+                {
+                    PRINT("triangle(" << p1 << ", ...)");
+                }
+                shape.Height = r.randomParam();
                 break;
+            case CIRCLE:
+                if (print)
+                {
+                    PRINT("circle(" << p1 << ")");
+                }
+                shape.Height = shape.Width;
+                break;
+            default:
+                std::cerr << "Bad random shape! " << t << '\n';
+                throw std::invalid_argument("Bad random shape");
+        }
+
+        if (i > 10)
+        {
+            print = false;
         }
     }
     return shapes;
@@ -38,15 +74,12 @@ shape_union** RawUnion::createShapePtrs(int seed, u32 countShapes)
         auto t = r.randomShapeType();
         shape_union* shape = new shape_union();
         shape->Type = t;
+        shape->Width = r.randomParam();
 
         switch(t)
         {
-            case SQUARE:
-            case CIRCLE:
-                shape->Width = r.randomParam();
-                break;
             case TRIANGLE:
-                shape->Width = r.randomParam();
+            case RECTANGLE:
                 shape->Height = r.randomParam();
                 break;
         }

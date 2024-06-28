@@ -7,6 +7,10 @@
 #include <numeric>
 #include <ranges>
 
+#ifdef HAVE_TBB
+# include <tbb/parallel_reduce.h>
+#endif
+
 ShapeCollection::ShapeCollection(int seed, u32 shapeCount)
 {
     Randomizer r{seed};
@@ -50,4 +54,57 @@ param_type ShapeCollection::TotalAreaParallel()
          get_area);
 
     return std::accumulate(areas.begin(), areas.end(), 0.0);
+}
+
+namespace
+{
+    class SumShapes
+    {
+        public:
+            using shape_base_ptr = ShapeCollection::shape_base_ptr;
+            using ShapeVector = ShapeCollection::ShapeVector;
+
+            SumShapes( SumShapes& x, tbb::split ) 
+                : m_shapes(x.m_shapes), m_result(0)
+            {}
+
+            SumShapes(const ShapeVector& shapes)
+                : m_shapes(shapes), m_result(0)
+            {}
+            
+            const ShapeVector& m_shapes;
+            param_type m_result;
+
+            void operator() (const tbb::blocked_range<size_t>& r)
+            {
+                param_type result = m_result;
+                const auto end = r.end();
+                for(size_t i=r.begin(); i!=end; ++i)
+                {
+                    result += m_shapes[i]->Area();
+                }
+                m_result = result;
+            }
+
+            void join( const SumShapes& y )
+            {
+                m_result += y.m_result;
+            }
+
+    };
+}
+
+param_type ShapeCollection::TotalAreaTBB_test()
+{
+    SumShapes summer{m_shapes};
+    tbb::blocked_range<size_t> range{0, m_shapes.size()};
+    summer(range);
+    return summer.m_result;
+}
+
+param_type ShapeCollection::TotalAreaTBB()
+{
+    SumShapes summer{m_shapes};
+    tbb::parallel_reduce(tbb::blocked_range<size_t>(0,m_shapes.size()), summer);
+    return summer.m_result;
 }

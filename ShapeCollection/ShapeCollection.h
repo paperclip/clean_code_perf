@@ -12,8 +12,12 @@ public:
     param_type TotalArea();
     param_type TotalAreaAccumulate();
     param_type TotalAreaParallel();
-private:
+#ifdef HAVE_TBB
+    param_type TotalAreaTBB();
+    param_type TotalAreaTBB_test();
+#endif
     using shape_base_ptr = std::unique_ptr<shape_base>;
     using ShapeVector = std::vector<shape_base_ptr>;
+private:
     ShapeVector m_shapes;
 };

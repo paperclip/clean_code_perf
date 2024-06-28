@@ -20,7 +20,7 @@ SRCS := \
 	SortedCollection/SortedCollection.o
 
 test : $(SRCS)
-	g++ -g -O3 $^ -o "$@"
+	g++ -g -O3 $^ -o "$@" -ltbb
 
 FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
 

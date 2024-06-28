@@ -20,6 +20,20 @@
 #include <cstdlib>
 #include <iostream>
 
+bool closeEnough(param_type expectedResult, param_type actualResult)
+{
+    auto difference = std::abs(expectedResult - actualResult);
+    auto relativeDiff = difference / expectedResult;
+    if (relativeDiff < 1e-10)
+    {
+        return true;
+    }
+    std::cerr << "Difference too big between " << expectedResult << " and " << actualResult
+         << " diff=" << difference 
+         << " relativeDiff=" << relativeDiff << '\n';
+    return false;
+}
+
 int main(int argc, char* argv[]) 
 {
     int seed = 12345;
@@ -27,16 +41,24 @@ int main(int argc, char* argv[])
 	    seed = strtol(argv[1], NULL, 10);
     }
 
-    constexpr int countShapes = 1048576 * 2;
+    // Count has to be a multiple of 4 for the by4 algorithms to work
+    constexpr int countShapes = 1048576; // 1048576 * 2;
     using namespace ankerl::nanobench;
     auto bench = ankerl::nanobench::Bench();
     bench.batch(countShapes);
     bench.unit("shape");
     bench.minEpochIterations(5);
-    
 
+    param_type expectedResult = 0.0;
+    
     {
         auto shapes = RawVirtual::createShapes(seed, countShapes);
+        expectedResult = TotalAreaVTBL::TotalArea(countShapes, shapes);
+        // std::cerr << "Expected result=" << expectedResult << '\n';
+        auto vtbl4Result = TotalAreaVTBL4::TotalArea(countShapes, shapes);
+        // std::cerr << "TotalAreaVTBL4::TotalArea(countShapes, shapes) = " << vtbl4Result << '\n';
+        // std::cerr << "Diff = " << (expectedResult - vtbl4Result) << '\n';
+        assert(closeEnough(expectedResult, vtbl4Result));
 
         bench.relative(true);
         bench.run("TotalAreaVTBL", [&]() {
@@ -52,15 +74,20 @@ int main(int argc, char* argv[])
 
     {
         auto shapes = RawUnion::createShapes(seed, countShapes);
+        assert(closeEnough(expectedResult, TotalAreaSwitch(countShapes, shapes)));
+
         bench.run("TotalAreaSwitch", [&]() {
             doNotOptimizeAway(TotalAreaSwitch(countShapes, shapes));
         });
+        assert(closeEnough(expectedResult, TotalAreaSwitch4(countShapes, shapes)));
         bench.run("TotalAreaSwitch4", [&]() {
             doNotOptimizeAway(TotalAreaSwitch4(countShapes, shapes));
         });
+        assert(closeEnough(expectedResult, TotalAreaUnion(countShapes, shapes)));
         bench.run("TotalAreaUnion", [&]() {
             doNotOptimizeAway(TotalAreaUnion(countShapes, shapes));
         });
+        assert(closeEnough(expectedResult, TotalAreaUnion4(countShapes, shapes)));
         bench.run("TotalAreaUnion4", [&]() {
             doNotOptimizeAway(TotalAreaUnion4(countShapes, shapes));
         });
@@ -94,6 +121,7 @@ int main(int argc, char* argv[])
     }
     {
         auto shapes = ShapeCollection(seed, countShapes);
+        assert(closeEnough(expectedResult, shapes.TotalArea()));
         bench.run("Shape Collection", [&]() {
             doNotOptimizeAway(shapes.TotalArea());
         });
@@ -103,6 +131,16 @@ int main(int argc, char* argv[])
         bench.run("Transform Parallel", [&]() {
             doNotOptimizeAway(shapes.TotalAreaParallel());
         });
+#ifdef HAVE_TBB
+        assert(closeEnough(expectedResult, shapes.TotalAreaTBB_test()));
+        // bench.run("Shape Collection TBB test", [&]() {
+        //     doNotOptimizeAway(shapes.TotalAreaTBB_test());
+        // });
+        assert(closeEnough(expectedResult, shapes.TotalAreaTBB()));
+        bench.run("Shape Collection TBB", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaTBB());
+        });
+#endif
     }
     {
         auto shapes = VariantCollection(seed, countShapes);

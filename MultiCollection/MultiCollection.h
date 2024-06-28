@@ -12,6 +12,7 @@ public:
     param_type TotalArea();
     param_type TotalAreaTemplate();
     param_type TotalAreaTemplateParallel();
+    param_type TotalAreaTbb();
 private:
     std::vector<square> m_squares;
     std::vector<rectangle> m_rectangles;

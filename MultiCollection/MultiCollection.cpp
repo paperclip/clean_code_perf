@@ -2,6 +2,10 @@
 
 #include "../random.h"
 
+#ifdef HAVE_TBB
+# include <tbb/parallel_reduce.h>
+#endif
+
 #include <stdexcept>
 
 MultiCollection::MultiCollection(int seed, u32 shapeCount)
@@ -91,3 +95,16 @@ param_type MultiCollection::TotalAreaTemplateParallel()
     auto ret4 = sum(m_circles);
     return ret1 + ret2 + ret3 + ret4;
 }
+
+#ifdef HAVE_TBB
+param_type MultiCollection::TotalAreaTbb()
+{
+    std::vector<std::function<param_type()>> summers;
+    summers.emplace_back([&]() -> param_type { return sum(m_squares);});
+    summers.emplace_back([&]() -> param_type { return sum(m_rectangles);});
+    summers.emplace_back([&]() -> param_type { return sum(m_triangles);});
+    summers.emplace_back([&]() -> param_type { return sum(m_circles);});
+    // tbb::parallel_reduce(
+    return 0.0;
+}
+#endif

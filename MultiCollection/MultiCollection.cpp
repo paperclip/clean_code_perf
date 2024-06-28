@@ -3,7 +3,10 @@
 #include "../random.h"
 
 #ifdef HAVE_TBB
+# include <tbb/parallel_invoke.h>
 # include <tbb/parallel_reduce.h>
+# include <tbb/blocked_range.h>
+# include <tbb/task_group.h>
 #endif
 
 #include <stdexcept>
@@ -97,14 +100,82 @@ param_type MultiCollection::TotalAreaTemplateParallel()
 }
 
 #ifdef HAVE_TBB
+
+
+namespace
+{
+    template<class ShapeClass>
+    class SumShapes
+    {
+        public:
+            using ShapeVector = std::vector<ShapeClass>;
+
+            SumShapes( SumShapes& x, tbb::split ) 
+                : m_shapes(x.m_shapes), m_result(0)
+            {}
+
+            SumShapes(const ShapeVector& shapes)
+                : m_shapes(shapes), m_result(0)
+            {}
+            
+            const ShapeVector& m_shapes;
+            param_type m_result;
+
+            void operator() (const tbb::blocked_range<size_t>& r)
+            {
+                param_type result = m_result;
+                const auto end = r.end();
+                for(size_t i=r.begin(); i!=end; ++i)
+                {
+                    result += m_shapes[i].Area();
+                }
+                m_result = result;
+            }
+
+            void join( const SumShapes& y )
+            {
+                m_result += y.m_result;
+            }
+
+            param_type operator()()
+            {
+                tbb::parallel_reduce(tbb::blocked_range<size_t>(0,m_shapes.size()), *this);
+                return m_result;
+            }
+    };
+}
+
 param_type MultiCollection::TotalAreaTbb()
 {
-    std::vector<std::function<param_type()>> summers;
-    summers.emplace_back([&]() -> param_type { return sum(m_squares);});
-    summers.emplace_back([&]() -> param_type { return sum(m_rectangles);});
-    summers.emplace_back([&]() -> param_type { return sum(m_triangles);});
-    summers.emplace_back([&]() -> param_type { return sum(m_circles);});
-    // tbb::parallel_reduce(
-    return 0.0;
+    SumShapes<square> squareSummer{m_squares};
+    SumShapes<rectangle> rectangleSummer{m_rectangles};
+    SumShapes<triangle> triangleSummer{m_triangles};
+    SumShapes<circle> circleSummer{m_circles};
+    return squareSummer() + rectangleSummer() + triangleSummer() + circleSummer();
+}
+
+param_type MultiCollection::TotalAreaTbb2()
+{
+    SumShapes<square> squareSummer{m_squares};
+    SumShapes<rectangle> rectangleSummer{m_rectangles};
+    SumShapes<triangle> triangleSummer{m_triangles};
+    SumShapes<circle> circleSummer{m_circles};
+
+    tbb::parallel_invoke(
+        [&]() {
+            squareSummer();
+        },
+        [&]() {
+            rectangleSummer();
+        },
+        [&]() {
+            triangleSummer();
+        },
+        [&]() {
+            circleSummer();
+        }
+    );
+
+    return squareSummer.m_result + rectangleSummer.m_result + triangleSummer.m_result + circleSummer.m_result;
 }
 #endif

@@ -56,6 +56,7 @@ param_type ShapeCollection::TotalAreaParallel()
     return std::accumulate(areas.begin(), areas.end(), 0.0);
 }
 
+#ifdef HAVE_TBB
 namespace
 {
     class SumShapes
@@ -108,3 +109,5 @@ param_type ShapeCollection::TotalAreaTBB()
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0,m_shapes.size()), summer);
     return summer.m_result;
 }
+
+#endif /* HAVE_TBB */

@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     auto bench = ankerl::nanobench::Bench();
     bench.batch(countShapes);
     bench.unit("shape");
-    bench.minEpochIterations(5);
+    bench.minEpochIterations(50);
 
     param_type expectedResult = 0.0;
     
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
         bench.run("Accumulate", [&]() {
             doNotOptimizeAway(shapes.TotalAreaAccumulate());
         });
-        bench.run("Transform Parallel", [&]() {
+        bench.run("Shape Collection Parallel", [&]() {
             doNotOptimizeAway(shapes.TotalAreaParallel());
         });
 #ifdef HAVE_TBB
@@ -150,6 +150,7 @@ int main(int argc, char* argv[])
     }
     {
         auto shapes = MultiCollection(seed, countShapes);
+        assert(closeEnough(expectedResult, shapes.TotalArea()));
         bench.run("MultiCollection", [&]() {
             doNotOptimizeAway(shapes.TotalArea());
         });
@@ -159,6 +160,16 @@ int main(int argc, char* argv[])
         bench.run("MultiCollectionTemplateParallel", [&]() {
             doNotOptimizeAway(shapes.TotalAreaTemplateParallel());
         });
+#ifdef HAVE_TBB
+        assert(closeEnough(expectedResult, shapes.TotalAreaTbb()));
+        bench.run("MultiCollection TBB", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaTbb());
+        });
+        assert(closeEnough(expectedResult, shapes.TotalAreaTbb2()));
+        bench.run("MultiCollection TBB 2", [&]() {
+            doNotOptimizeAway(shapes.TotalAreaTbb2());
+        });
+#endif
     }
     {
         auto shapes = Sorted::SortedCollection(seed, countShapes);

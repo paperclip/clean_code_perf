@@ -6,7 +6,6 @@ SRCS := \
 	nanobench.o \
 	random.o \
 	raw_virtual.o \
-	mt/SFMT.o \
 	ShapeCollection/ShapeCollection.o \
 	CachedShapeCollection/CachedShapeCollection.o \
 	Switch/listing25.o \

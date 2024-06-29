@@ -57,6 +57,8 @@ One approach beat any of the unclean approaches:
 
 * MultiCollection - storing each shape type in its own vector, that was 4x faster than the original, and faster than the TotalAreaUnion consistently.
 
+The parallel and TBB approaches are much faster - but do use multiple cores to achieve this.
+
 Testing
 =======
 

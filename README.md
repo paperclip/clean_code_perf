@@ -52,6 +52,7 @@ Most of the things I tried were not any better or worse:
 One approach was massively slower:
 
 * sorting collection - I think this saves branch misses at the expense of jumping around memory.
+** Probably would be faster than default if we had memory fragmentation
 
 One approach beat any of the unclean approaches:
 
@@ -68,5 +69,7 @@ Tests were run on x86_64 under WSL.
 ===========
 
 * nanobench - https://github.com/martinus/nanobench/releases/tag/v4.3.11
+* OneTBB - installed with "sudo apt install libtbb-dev"
+** Change Makefile to remove dependency
 
 MIT licenced.

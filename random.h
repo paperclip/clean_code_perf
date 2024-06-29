@@ -13,6 +13,4 @@ class Randomizer
         param_type randomParam();
     private:
         std::mt19937 m_random;
-        std::uniform_real_distribution<param_type> m_double;
-        std::uniform_int_distribution<uint64_t> m_type;
 };

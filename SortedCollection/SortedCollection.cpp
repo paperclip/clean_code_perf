@@ -14,17 +14,18 @@ namespace
 {
     shape_base* createShape(Randomizer& r)
     {
-        auto t = r.randomShapeType();
+        const auto t = r.randomShapeType();
+        const auto p1 = r.randomParam();
         switch(t)
         {
             case SQUARE:
-                return new square(r.randomParam());
+                return new square(p1);
             case RECTANGLE:
-                return new rectangle(r.randomParam(), r.randomParam());
+                return new rectangle(p1, r.randomParam());
             case TRIANGLE:
-                return new triangle(r.randomParam(), r.randomParam());
+                return new triangle(p1, r.randomParam());
             case CIRCLE:
-                return new circle(r.randomParam());
+                return new circle(p1);
             default:
                 std::cerr << "Bad random shape! " << t << '\n';
                 throw std::invalid_argument("Bad random shape");

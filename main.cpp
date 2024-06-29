@@ -17,6 +17,7 @@
 #include "random.h"
 #include "raw_virtual.h"
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 

@@ -22,20 +22,21 @@ MultiCollection::MultiCollection(int seed, u32 shapeCount)
 
     for (auto i=0; i<shapeCount; i++)
     {
-        auto t = r.randomShapeType();
+        const auto t = r.randomShapeType();
+        const auto p1 = r.randomParam();
         switch(t)
         {
             case SQUARE:
-                m_squares.emplace_back(r.randomParam());
+                m_squares.emplace_back(p1);
                 break;
             case RECTANGLE:
-                m_rectangles.emplace_back(r.randomParam(), r.randomParam());
+                m_rectangles.emplace_back(p1, r.randomParam());
                 break;
             case TRIANGLE:
-                m_triangles.emplace_back(r.randomParam(), r.randomParam());
+                m_triangles.emplace_back(p1, r.randomParam());
                 break;
             case CIRCLE:
-                m_circles.emplace_back(r.randomParam());
+                m_circles.emplace_back(p1);
                 break;
             default:
                 throw std::invalid_argument("Bad random shape");

@@ -12,7 +12,6 @@
 shape_base* RawVirtual::createShape(Randomizer& r, bool print)
 {
     auto t = r.randomShapeType();
-    shape_base* shape = nullptr;
     auto p1 = r.randomParam();
     param_type p2;
     switch(t)
@@ -43,11 +42,9 @@ shape_base* RawVirtual::createShape(Randomizer& r, bool print)
                 PRINT("circle(" << p1 << ")");
             }
             return new circle(p1);
-        default:
-            std::cerr << "Bad random shape! " << t << '\n';
-            throw std::invalid_argument("Bad random shape");
     }
-    return shape;
+    std::cerr << "Bad random shape! " << t << '\n';
+    throw std::invalid_argument("Bad random shape");
 }
 
 shape_base** RawVirtual::createShapes(int seed, u32 countShapes)

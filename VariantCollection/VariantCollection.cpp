@@ -13,19 +13,20 @@ VariantCollection::VariantCollection(int seed, u32 shapeCount)
     for (auto i=0; i<shapeCount; i++)
     {
         auto t = r.randomShapeType();
+        auto p1 = r.randomParam();
         switch(t)
         {
             case SQUARE:
-                m_shapes.emplace_back(square{r.randomParam()});
+                m_shapes.emplace_back(square{p1});
                 break;
             case RECTANGLE:
-                m_shapes.emplace_back(rectangle{r.randomParam(), r.randomParam()});
+                m_shapes.emplace_back(rectangle{p1, r.randomParam()});
                 break;
             case TRIANGLE:
-                m_shapes.emplace_back(triangle{r.randomParam(), r.randomParam()});
+                m_shapes.emplace_back(triangle{p1, r.randomParam()});
                 break;
             case CIRCLE:
-                m_shapes.emplace_back(circle{r.randomParam()});
+                m_shapes.emplace_back(circle{p1});
                 break;
             default:
                 throw std::invalid_argument("Bad random shape");

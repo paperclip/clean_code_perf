@@ -14,7 +14,7 @@ enum shape_type_union : u32
 
 struct shape_union
 {
-    shape_type Type;
+    shape_type_union Type;
     f32 Width;
     f32 Height;
 };

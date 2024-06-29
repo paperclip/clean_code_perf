@@ -3,6 +3,7 @@
 
 #include "../raw_virtual.h"
 
+#include <cassert>
 #include <execution>
 #include <numeric>
 #include <ranges>
@@ -16,10 +17,16 @@ ShapeCollection::ShapeCollection(int seed, u32 shapeCount)
     Randomizer r{seed};
 
     m_shapes.reserve(shapeCount);
+    bool print = false;
     for (auto i=0; i<shapeCount; i++)
     {
-        shape_base_ptr shape{RawVirtual::createShape(r)};
-        m_shapes.push_back(std::move(shape));
+        shape_base_ptr shape{RawVirtual::createShape(r, print)};
+        assert(shape);
+        m_shapes.emplace_back(std::move(shape));
+        if (i > 10)
+        {
+            print = false;
+        }
     }
 }
 

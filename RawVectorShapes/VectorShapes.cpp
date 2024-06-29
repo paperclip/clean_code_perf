@@ -3,6 +3,8 @@
 
 #include "../raw_virtual.h"
 
+#include <cassert>
+
 f32 RawVectorShapes::TotalArea(const RawVectorShapes::ShapeVector& shapes)
 {
     param_type result = 0.0;
@@ -23,7 +25,9 @@ namespace RawVectorShapes
         result.reserve(shapeCount);
         for (auto i=0; i<shapeCount; i++)
         {
-            result.push_back(RawVirtual::createShape(r));
+            auto* shape = RawVirtual::createShape(r);
+            assert(shape != nullptr);
+            result.push_back(shape);
         }
         return result;
     }

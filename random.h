@@ -3,9 +3,7 @@
 
 #include "shape_type.h"
 
-#define SFMT_MEXP 19937
-
-#include "mt/SFMT.h"
+#include <random>
 
 class Randomizer
 {
@@ -14,5 +12,7 @@ class Randomizer
         shape_type randomShapeType();
         param_type randomParam();
     private:
-        sfmt_t m_mt;
+        std::mt19937 m_random;
+        std::uniform_real_distribution<param_type> m_double;
+        std::uniform_int_distribution<uint64_t> m_type;
 };

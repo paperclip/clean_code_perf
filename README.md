@@ -66,6 +66,5 @@ Tests were run on x86_64 under WSL.
 ===========
 
 * nanobench - https://github.com/martinus/nanobench/releases/tag/v4.3.11
-* Mersenne Twister - http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/SFMT/index.html
 
-Both MIT licenced.
+MIT licenced.

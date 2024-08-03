@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <numbers>
 
 #if __has_include(<tbb/parallel_reduce.h>)
 # define HAVE_TBB 
@@ -19,4 +20,4 @@ enum shape_type
 using param_type = double;
 using f32 = param_type; // Actually double 64 bits
 using u32 = uint32_t;
-constexpr param_type Pi32 = 3.14159;
+constexpr param_type Pi32 = std::numbers::pi;

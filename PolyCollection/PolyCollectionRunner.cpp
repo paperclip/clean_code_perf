@@ -1,21 +1,19 @@
 #include "PolyCollectionRunner.h"
 
-#include "boost/poly_collection/algorithm.hpp"
-
 #include "../random.h"
-
+#include "boost/poly_collection/algorithm.hpp"
 
 PolyCollectionType createPolyShapeContainer(int seed, u32 shapeCount)
 {
     PolyCollectionType c;
     Randomizer r{seed};
-    
-    for (auto i=0; i<shapeCount; i++)
+
+    for (auto i = 0; i < shapeCount; i++)
     {
         const auto t = r.randomShapeType();
         const auto p1 = r.randomParam();
-        
-        switch(t)
+
+        switch (t)
         {
             case SQUARE:
                 c.insert(square(p1));
@@ -49,18 +47,15 @@ param_type PolyCollectionTotalAreaRangeFor(const PolyCollectionType& c)
 param_type PolyCollectionTotalAreaForEach(const PolyCollectionType& c)
 {
     param_type result{0};
-    boost::poly_collection::for_each(c.begin(), c.end(), [&result](const auto& x){
-        result += x.Area();
-    });
+    boost::poly_collection::for_each(c.begin(), c.end(), [&result](const auto& x) { result += x.Area(); });
     return result;
 }
 
 param_type PolyCollectionTotalAreaForEachRestitution(const PolyCollectionType& c)
 {
     param_type result{0};
-    boost::poly_collection::for_each<square,rectangle,triangle,circle>(c.begin(), c.end(), [&result](const auto& x){
-        result += x.Area();
-    });
+    boost::poly_collection::for_each<square, rectangle, triangle, circle>(
+        c.begin(), c.end(), [&result](const auto& x) { result += x.Area(); });
     return result;
 }
 

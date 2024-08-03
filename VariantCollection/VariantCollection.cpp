@@ -10,37 +10,57 @@ VariantCollection::VariantCollection(int seed, u32 shapeCount)
     Randomizer r{seed};
 
     m_shapes.reserve(shapeCount);
-    for (auto i=0; i<shapeCount; i++)
+    for (auto i = 0; i < shapeCount; i++)
     {
         auto t = r.randomShapeType();
         auto p1 = r.randomParam();
-        switch(t)
+        switch (t)
         {
-            case SQUARE:
-                m_shapes.emplace_back(square{p1});
-                break;
-            case RECTANGLE:
-                m_shapes.emplace_back(rectangle{p1, r.randomParam()});
-                break;
-            case TRIANGLE:
-                m_shapes.emplace_back(triangle{p1, r.randomParam()});
-                break;
-            case CIRCLE:
-                m_shapes.emplace_back(circle{p1});
-                break;
-            default:
-                throw std::invalid_argument("Bad random shape");
+        case SQUARE:
+            m_shapes.emplace_back(square{p1});
+            break;
+        case RECTANGLE:
+            m_shapes.emplace_back(rectangle{p1, r.randomParam()});
+            break;
+        case TRIANGLE:
+            m_shapes.emplace_back(triangle{p1, r.randomParam()});
+            break;
+        case CIRCLE:
+            m_shapes.emplace_back(circle{p1});
+            break;
+        default:
+            throw std::invalid_argument("Bad random shape");
         }
     }
 }
 
-param_type VariantCollection::TotalArea()
+param_type VariantCollection::TotalAreaLambda()
 {
     param_type result = 0.0;
-    for (const auto& shape : m_shapes)
+    for (const auto &shape : m_shapes)
     {
-        std::visit([&result](auto&& arg){result += arg.Area(); }, shape);
+        std::visit([&result](auto &&arg)
+                   { result += arg.Area(); }, shape);
     }
-    return result;    
+    return result;
 }
 
+namespace
+{
+    struct Summer
+    {
+        param_type total_;
+        template <class T>
+        void operator()(T &in)
+        {
+            total_ += in.Area();
+        }
+    };
+}
+
+param_type VariantCollection::TotalAreaStruct()
+{
+    Summer summer;
+    visit(summer);
+    return summer.total_;
+}

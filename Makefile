@@ -24,7 +24,7 @@ test : $(SRCS)
 FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
 
 %.o : %.cpp
-	g++ $(FLAGS) -c $< -o $@
+	g++ $(FLAGS) -c $< -o $@ -std=c++20
 
 %.o : %.c
 	gcc $(FLAGS) -O3 -c $< -o $@

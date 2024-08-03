@@ -1,5 +1,7 @@
 #include "PolyCollectionRunner.h"
 
+#include "boost/poly_collection/algorithm.hpp"
+
 #include "../random.h"
 
 
@@ -34,12 +36,43 @@ PolyCollectionType createPolyShapeContainer(int seed, u32 shapeCount)
     return c;
 }
 
-param_type PolyCollectionTotalArea(const PolyCollectionType& c)
+param_type PolyCollectionTotalAreaRangeFor(const PolyCollectionType& c)
 {
-    param_type result;
+    param_type result{0};
     for (const auto& s : c)
     {
         result += s.Area();
+    }
+    return result;
+}
+
+param_type PolyCollectionTotalAreaForEach(const PolyCollectionType& c)
+{
+    param_type result{0};
+    boost::poly_collection::for_each(c.begin(), c.end(), [&result](const auto& x){
+        result += x.Area();
+    });
+    return result;
+}
+
+param_type PolyCollectionTotalAreaForEachRestitution(const PolyCollectionType& c)
+{
+    param_type result{0};
+    boost::poly_collection::for_each<square,rectangle,triangle,circle>(c.begin(), c.end(), [&result](const auto& x){
+        result += x.Area();
+    });
+    return result;
+}
+
+param_type PolyCollectionTotalAreaSegmentFor(const PolyCollectionType& c)
+{
+    param_type result{0};
+    for (const auto& seg_info : c.segment_traversal())
+    {
+        for (const auto& s : seg_info)
+        {
+            result += s.Area();
+        }
     }
     return result;
 }

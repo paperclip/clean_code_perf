@@ -85,9 +85,22 @@ int main(int argc, char *argv[])
     }
     {
         auto shapes = createPolyShapeContainer(seed, countShapes);
-        assert(closeEnough(expectedResult, PolyCollectionTotalArea(shapes), " (BoostPoly)"));
-        bench.run("BoostPoly", [&]()
-                  { doNotOptimizeAway(PolyCollectionTotalArea(shapes)); });
+
+        assert(closeEnough(expectedResult, PolyCollectionTotalAreaRangeFor(shapes), " (BoostPoly RangeFor)"));
+        bench.run("BoostPoly RangeFor", [&]()
+                  { doNotOptimizeAway(PolyCollectionTotalAreaRangeFor(shapes)); });
+
+        assert(closeEnough(expectedResult, PolyCollectionTotalAreaForEach(shapes), " (BoostPoly ForEach)"));
+        bench.run("BoostPoly ForEach", [&]()
+                  { doNotOptimizeAway(PolyCollectionTotalAreaForEach(shapes)); });
+
+        assert(closeEnough(expectedResult, PolyCollectionTotalAreaForEachRestitution(shapes), " (BoostPoly ForEachRestitution)"));
+        bench.run("BoostPoly ForEachRestitution", [&]()
+                  { doNotOptimizeAway(PolyCollectionTotalAreaForEachRestitution(shapes)); });
+
+        assert(closeEnough(expectedResult, PolyCollectionTotalAreaSegmentFor(shapes), " (BoostPoly SegFor)"));
+        bench.run("BoostPoly SegFor", [&]()
+                  { doNotOptimizeAway(PolyCollectionTotalAreaSegmentFor(shapes)); });
     }
     {
         auto shapes = createHeterogeneousShapeContainer(seed, countShapes);

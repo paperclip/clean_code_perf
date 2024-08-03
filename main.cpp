@@ -45,7 +45,17 @@ int main(int argc, char *argv[])
     }
 
     // Count has to be a multiple of 4 for the by4 algorithms to work
-    constexpr int countShapes = 1048576; // 1048576 * 2;
+    int countShapes =
+#ifdef __arm__
+        4096;
+#else
+        1048576; // 1048576 * 2;
+#endif
+    if (argc >= 3)
+    {
+        countShapes = strtol(argv[2], nullptr, 10);
+    }
+    std::cerr << "Shape Count: " << countShapes << '\n';
     using namespace ankerl::nanobench;
     auto bench = ankerl::nanobench::Bench();
     bench.batch(countShapes);

@@ -13,6 +13,7 @@
 #include "MultiCollection/MultiCollection.h"
 #include "SortedCollection/SortedCollection.h"
 #include "HeterogeneousCollection/HetRunner.h"
+#include "PolyCollection/PolyCollectionRunner.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -81,6 +82,12 @@ int main(int argc, char *argv[])
                   { doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes)); });
 
         RawVirtual::deleteShapes(shapes, countShapes);
+    }
+    {
+        auto shapes = createPolyShapeContainer(seed, countShapes);
+        assert(closeEnough(expectedResult, PolyCollectionTotalArea(shapes), " (BoostPoly)"));
+        bench.run("BoostPoly", [&]()
+                  { doNotOptimizeAway(PolyCollectionTotalArea(shapes)); });
     }
     {
         auto shapes = createHeterogeneousShapeContainer(seed, countShapes);

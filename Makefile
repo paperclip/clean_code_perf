@@ -18,7 +18,8 @@ SRCS := \
 	MultiCollection/MultiCollection.o \
 	SortedCollection/SortedCollection.o \
 	HeterogeneousCollection/HeterogeneousCollection.o \
-	HeterogeneousCollection/HetRunner.o
+	HeterogeneousCollection/HetRunner.o \
+	PolyCollection/PolyCollectionRunner.o
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@" -ltbb

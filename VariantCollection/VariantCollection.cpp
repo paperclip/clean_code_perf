@@ -49,7 +49,7 @@ namespace
 {
     struct Summer
     {
-        param_type total_;
+        param_type total_{0};
         template <class T>
         void operator()(T &in)
         {

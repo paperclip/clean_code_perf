@@ -39,7 +39,7 @@ namespace
 {
     struct Summer : andyg::visitor_base<square, rectangle, triangle, circle>
     {
-        param_type total_;
+        param_type total_{0};
 
         template<class T>
         void operator()(T& _in) 

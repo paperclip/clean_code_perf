@@ -6,3 +6,14 @@ ColumnLimit: 120
 DerivePointerAlignment: false
 PointerAlignment: Left
 ReferenceAlignment: Left
+InsertBraces: true
+BreakBeforeBraces: Allman
+FixNamespaceComments: true
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortBlocksOnASingleLine: Never
+AllowShortLambdasOnASingleLine: Inline
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: InlineOnly
+BreakConstructorInitializers: AfterColon
+NamespaceIndentation: All
+

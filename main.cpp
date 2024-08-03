@@ -12,6 +12,7 @@
 #include "VariantCollection/VariantCollection.h"
 #include "MultiCollection/MultiCollection.h"
 #include "SortedCollection/SortedCollection.h"
+#include "HeterogeneousCollection/HetRunner.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -70,6 +71,12 @@ int main(int argc, char *argv[])
                   { doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes)); });
 
         RawVirtual::deleteShapes(shapes, countShapes);
+    }
+    {
+        auto shapes = createHeterogeneousShapeContainer(seed, countShapes);
+        assert(closeEnough(expectedResult, HeterogeneousTotalArea(shapes), " (Heterogeneous)"));
+        bench.run("Heterogeneous", [&]()
+                  { doNotOptimizeAway(HeterogeneousTotalArea(shapes)); });
     }
 
     {

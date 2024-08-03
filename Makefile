@@ -16,7 +16,9 @@ SRCS := \
 	VariantCollection/VariantCollection.o \
 	RawVectorShapes/VectorShapes.o \
 	MultiCollection/MultiCollection.o \
-	SortedCollection/SortedCollection.o
+	SortedCollection/SortedCollection.o \
+	HeterogeneousCollection/HeterogeneousCollection.o \
+	HeterogeneousCollection/HetRunner.o
 
 test : $(SRCS)
 	g++ -g -O3 $^ -o "$@" -ltbb

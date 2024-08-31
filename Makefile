@@ -1,27 +1,8 @@
 
-SRCS := \
-	main.o \
-	listing23.o \
-	listing24.o \
-	nanobench.o \
-	random.o \
-	raw_virtual.o \
-	ShapeCollection/ShapeCollection.o \
-	CachedShapeCollection/CachedShapeCollection.o \
-	Switch/listing25.o \
-	SwitchPtr/SwitchPtr.o \
-	Union/raw_union.o \
-	UnionTable/listing27.o \
-	UniqueVector/UniqueVector.o \
-	VariantCollection/VariantCollection.o \
-	RawVectorShapes/VectorShapes.o \
-	MultiCollection/MultiCollection.o \
-	SortedCollection/SortedCollection.o \
-	HeterogeneousCollection/HeterogeneousCollection.o \
-	HeterogeneousCollection/HetRunner.o \
-	PolyCollection/PolyCollectionRunner.o
+sources := $(wildcard *.cpp) $(wildcard */*.cpp)
+objects := $(patsubst %.cpp,%.o,$(sources))
 
-test : $(SRCS)
+test : $(objects)
 	g++ -g -O3 $^ -o "$@" -ltbb
 
 FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
@@ -35,4 +16,4 @@ FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
 clean :
 	rm -f test *.o */*.o
 
-.PHONY : clean
+.PHONY : clean e

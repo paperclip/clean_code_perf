@@ -17,7 +17,7 @@ enum shape_type
     END
 };
 
-using param_type = double;
-using f32 = param_type; // Actually double 64 bits
+using param_type = float;
+using f32 = param_type;
 using u32 = uint32_t;
 constexpr param_type Pi32 = std::numbers::pi;

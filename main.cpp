@@ -14,6 +14,7 @@
 #include "SortedCollection/SortedCollection.h"
 #include "HeterogeneousCollection/HetRunner.h"
 #include "PolyCollection/PolyCollectionRunner.h"
+#include "HighAccuracy/HighAccuracyCollection.h"
 
 #include "nanobench.h"
 #include "random.h"
@@ -22,6 +23,15 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+
+void printDifference(param_type expectedResult, param_type actualResult, const std::string &note = "")
+{
+    auto difference = std::abs(expectedResult - actualResult);
+    auto relativeDiff = difference / expectedResult;
+    std::cerr << "Difference between " << expectedResult << " and " << actualResult
+              << " " << note << " diff=" << difference
+              << " relativeDiff=" << relativeDiff << '\n';
+}
 
 bool closeEnough(param_type expectedResult, param_type actualResult, const std::string &note = "")
 {
@@ -32,7 +42,7 @@ bool closeEnough(param_type expectedResult, param_type actualResult, const std::
         return true;
     }
     std::cerr << "Difference too big between " << expectedResult << " and " << actualResult
-              << note << " diff=" << difference
+              << " " << note << " diff=" << difference
               << " relativeDiff=" << relativeDiff << '\n';
     return false;
 }
@@ -69,19 +79,27 @@ int main(int argc, char *argv[])
         auto shapes = RawVirtual::createShapes(seed, countShapes);
         expectedResult = TotalAreaVTBL::TotalArea(countShapes, shapes);
         // std::cerr << "Expected result=" << expectedResult << '\n';
-        auto vtbl4Result = TotalAreaVTBL4::TotalArea(countShapes, shapes);
-        // std::cerr << "TotalAreaVTBL4::TotalArea(countShapes, shapes) = " << vtbl4Result << '\n';
-        // std::cerr << "Diff = " << (expectedResult - vtbl4Result) << '\n';
-        assert(closeEnough(expectedResult, vtbl4Result));
 
         bench.relative(true);
         bench.run("TotalAreaVTBL", [&]()
                   { doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes)); });
 
+        auto vtbl4Result = TotalAreaVTBL4::TotalArea(countShapes, shapes);
+        // std::cerr << "TotalAreaVTBL4::TotalArea(countShapes, shapes) = " << vtbl4Result << '\n';
+        // std::cerr << "Diff = " << (expectedResult - vtbl4Result) << '\n';
+        assert(closeEnough(expectedResult, vtbl4Result));
         bench.run("TotalAreaVTBL4", [&]()
                   { doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes)); });
 
         RawVirtual::deleteShapes(shapes, countShapes);
+    }
+    {
+        HighAccuracyCollection shapes;
+        shapes.setup(seed, countShapes);
+        assert(closeEnough(expectedResult, shapes.TotalArea(), shapes.description()));
+        printDifference(expectedResult, shapes.TotalArea(), shapes.description());
+        bench.run(shapes.description(), [&]()
+                  { doNotOptimizeAway(shapes.TotalArea()); });
     }
     {
         auto shapes = createPolyShapeContainer(seed, countShapes);

@@ -19,6 +19,6 @@ shape_type Randomizer::randomShapeType()
 
 param_type Randomizer::randomParam()
 {
-    static std::uniform_real_distribution<param_type> doubleGenerator{0, 10};
+    static std::uniform_real_distribution<param_type> doubleGenerator{0, 100};
     return doubleGenerator(m_random);
 }

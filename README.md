@@ -105,5 +105,8 @@ Tests were run on x86_64 under WSL.
 * nanobench - https://github.com/martinus/nanobench/releases/tag/v4.3.11
 * OneTBB - installed with "sudo apt install libtbb-dev"
 * * Change Makefile to remove dependency
+* https://github.com/FabienPean/heco_experiments/blob/master/heco_n_map_vector.h
+* boost poly-collection
+* https://gieseanw.wordpress.com/2017/05/03/a-true-heterogeneous-container-in-c/
 
 MIT licenced.

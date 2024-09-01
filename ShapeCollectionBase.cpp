@@ -2,6 +2,7 @@
 
 #include "random.h"
 
+#include <cassert>
 #include <exception>
 #include <iostream>
 
@@ -37,6 +38,7 @@ void ShapeCollectionBase::setup(int seed, u32 shapeCount)
     for (auto i=0; i<shapeCount; i++)
     {
         shape_base_ptr shape{createShape(r)};
+        assert(shape);
         insert(shape);
     }
     postSetup();

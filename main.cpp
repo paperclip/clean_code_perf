@@ -15,6 +15,9 @@
 #include "HeterogeneousCollection/HetRunner.h"
 #include "PolyCollection/PolyCollectionRunner.h"
 #include "HighAccuracy/HighAccuracyCollection.h"
+#include "HighAccuracy/MultipleAccumulatorCollection.h"
+#include "heco/HecoContainer.h"
+
 
 #include "nanobench.h"
 #include "random.h"
@@ -24,27 +27,35 @@
 #include <cstdlib>
 #include <iostream>
 
-void printDifference(param_type expectedResult, param_type actualResult, const std::string &note = "")
+namespace
 {
-    auto difference = std::abs(expectedResult - actualResult);
-    auto relativeDiff = difference / expectedResult;
-    std::cerr << "Difference between " << expectedResult << " and " << actualResult
-              << " " << note << " diff=" << difference
-              << " relativeDiff=" << relativeDiff << '\n';
-}
-
-bool closeEnough(param_type expectedResult, param_type actualResult, const std::string &note = "")
-{
-    auto difference = std::abs(expectedResult - actualResult);
-    auto relativeDiff = difference / expectedResult;
-    if (relativeDiff < 1e-3)
+    void printDifference(double expectedResult, double actualResult, const std::string &note = "")
     {
-        return true;
+        auto difference = std::abs(expectedResult - actualResult);
+        auto relativeDiff = difference / expectedResult;
+        std::cerr << "Difference between " << expectedResult << " and " << actualResult
+                << " " << note << " diff=" << difference
+                << " relativeDiff=" << relativeDiff << '\n';
     }
-    std::cerr << "Difference too big between " << expectedResult << " and " << actualResult
-              << " " << note << " diff=" << difference
-              << " relativeDiff=" << relativeDiff << '\n';
-    return false;
+
+    bool closeEnough(double expectedResult, double actualResult, const std::string &note = "")
+    {
+        auto difference = std::abs(expectedResult - actualResult);
+        auto relativeDiff = difference / expectedResult;
+        if (relativeDiff < 1e-3)
+        {
+            return true;
+        }
+        std::cerr << "Difference too big between " << expectedResult << " and " << actualResult
+                << " " << note << " diff=" << difference
+                << " relativeDiff=" << relativeDiff << '\n';
+        return false;
+    }
+
+    bool closeEnough(double expectedResult, ShapeCollectionBase& actual)
+    {
+        return closeEnough(expectedResult, actual.TotalArea(), actual.description());
+    }
 }
 
 int main(int argc, char *argv[])
@@ -72,6 +83,7 @@ int main(int argc, char *argv[])
     bench.batch(countShapes);
     bench.unit("shape");
     bench.minEpochIterations(50);
+    bench.relative(true);
 
     param_type expectedResult = 0.0;
 
@@ -80,7 +92,6 @@ int main(int argc, char *argv[])
         expectedResult = TotalAreaVTBL::TotalArea(countShapes, shapes);
         // std::cerr << "Expected result=" << expectedResult << '\n';
 
-        bench.relative(true);
         bench.run("TotalAreaVTBL", [&]()
                   { doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes)); });
 
@@ -96,8 +107,31 @@ int main(int argc, char *argv[])
     {
         HighAccuracyCollection shapes;
         shapes.setup(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes.TotalArea(), shapes.description()));
-        printDifference(expectedResult, shapes.TotalArea(), shapes.description());
+        assert(closeEnough(expectedResult, shapes));
+        // printDifference(expectedResult, shapes.TotalArea(), shapes.description());
+        bench.run(shapes.description(), [&]()
+                  { doNotOptimizeAway(shapes.TotalArea()); });
+    }
+    // Doesn't appear to be any more accurate than the above
+    // {
+    //     MultipleAccumulatorCollection shapes;
+    //     shapes.setup(seed, countShapes);
+    //     assert(closeEnough(expectedResult, shapes));
+    //     printDifference(expectedResult, shapes.TotalArea(), shapes.description());
+    //     bench.run(shapes.description(), [&]()
+    //               { doNotOptimizeAway(shapes.TotalArea()); });
+    // }
+    {
+        HecoContainer shapes;
+        shapes.setup(seed, countShapes);
+        assert(closeEnough(expectedResult, shapes));
+        bench.run(shapes.description(), [&]()
+                  { doNotOptimizeAway(shapes.TotalArea()); });
+    }
+    {
+        HecoContainerTBB shapes;
+        shapes.setup(seed, countShapes);
+        assert(closeEnough(expectedResult, shapes));
         bench.run(shapes.description(), [&]()
                   { doNotOptimizeAway(shapes.TotalArea()); });
     }

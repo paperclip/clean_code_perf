@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "listing22.h"
 
 #include <memory>
@@ -32,4 +34,12 @@ class ShapeCollectionBase
          * Get a short-description of the test
          */
         virtual std::string description() = 0;
+
+        /** 
+         * Override to disable this collection from testing
+         */
+        virtual bool enabled()
+        {
+            return true;
+        }
 };

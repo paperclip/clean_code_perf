@@ -2,10 +2,7 @@
 
 #include "../ShapeCollection/SimpleShapeCollectionBase.h"
 
-#include <memory>
-#include <vector>
-
-class CachedShapeCollection : public SimpleShapeCollectionBase
+class PreCalcCollection : public SimpleShapeCollectionBase
 {
 public:
     /**
@@ -13,11 +10,16 @@ public:
      */
     std::string description() override
     {
-        return "Cached Collection";
+        return "PreCalcCollection";
     }
+    
+    void postSetup() override;
 
     // Test method
-    param_type TotalArea() override;
+    param_type TotalArea() override
+    {
+        return m_totalArea;
+    }
 
 private:
     param_type m_totalArea = 0.0;

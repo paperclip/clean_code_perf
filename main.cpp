@@ -2,6 +2,7 @@
 #include "listing23.h"
 #include "listing24.h"
 #include "CachedShapeCollection/CachedShapeCollection.h"
+#include "CachedShapeCollection/PreCalcCollection.h"
 #include "RawVectorShapes/VectorShapes.h"
 #include "ShapeCollection/ShapeCollection.h"
 #include "Switch/listing25.h"
@@ -119,8 +120,9 @@ int main(int argc, char *argv[])
 #ifdef HAVE_TBB
     collections.emplace_back(std::make_unique<HecoContainerTBB>());
 #endif
-    collections.emplace_back(std::make_unique<CachedShapeCollection>());
     collections.emplace_back(std::make_unique<Sorted::SortedCollection>());
+    collections.emplace_back(std::make_unique<CachedShapeCollection>());
+    collections.emplace_back(std::make_unique<PreCalcCollection>());
 
     for (auto& shapes : collections)
     {

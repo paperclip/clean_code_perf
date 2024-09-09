@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+class Randomizer;
+
 class ShapeCollectionBase
 {
     public:
@@ -19,6 +21,12 @@ class ShapeCollectionBase
          */
         virtual void insert(std::unique_ptr<shape_base>& shape) = 0;
 
+        virtual void insertSquare(param_type side);
+        virtual void insertRectangle(param_type width, param_type height);
+        virtual void insertCircle(param_type radius);
+        virtual void insertTriangle(param_type base, param_type height);
+
+        void insertRandomShape(Randomizer& r);
         void setup(int seed, u32 shapeCount);
 
         /**

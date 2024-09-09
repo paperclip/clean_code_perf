@@ -22,14 +22,16 @@ class HecoContainer : public ShapeCollectionBase
         /**
          * Add a new shape to the collection
          */
-        void insert(std::unique_ptr<shape_base>& shape) override;
+        void insert(std::unique_ptr<shape_base>& shape) override
+        {
+            throw std::invalid_argument("Should not be called");
+        }
 
-        /**
-         * Post setup fix up point.
-         */
-        void postSetup() override {};
+        void insertSquare(param_type side) override;
+        void insertRectangle(param_type width, param_type height) override;
+        void insertCircle(param_type radius) override;
+        void insertTriangle(param_type base, param_type height) override;
 
-        
         // Test method
         param_type TotalArea() override;
 

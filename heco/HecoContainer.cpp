@@ -14,14 +14,6 @@
 namespace
 {
     template<class T>
-    void insertShape(heco::HeterogeneousContainer_n& container, std::unique_ptr<shape_base>& shape)
-    {
-        assert(shape);
-        T* sp = dynamic_cast<T*>(shape.get());
-        container.append(*sp);
-    }
-
-    template<class T>
     param_type SumArea(heco::HeterogeneousContainer_n& container)
     {
         param_type accumulator = 0.0;
@@ -41,27 +33,27 @@ HecoContainer::HecoContainer()
     : m_total(0)
 {}
 
-/**
- * Add a new shape to the collection
- */
-void HecoContainer::insert(std::unique_ptr<shape_base>& shape)
+void HecoContainer::insertSquare(param_type side)
 {
-    assert(shape);
-    switch (shape->Type())
-    {
-        case SQUARE:
-            insertShape<square>(m_shapes, shape);
-            break;
-        case CIRCLE:
-            insertShape<circle>(m_shapes, shape);
-            break;
-        case RECTANGLE:
-            insertShape<rectangle>(m_shapes, shape);
-            break;
-        case TRIANGLE:
-            insertShape<triangle>(m_shapes, shape);
-            break;
-    }
+    m_shapes.append(square(side));
+    m_total += 1;
+}
+
+void HecoContainer::insertRectangle(param_type width, param_type height)
+{
+    m_shapes.append(rectangle(width, height));
+    m_total += 1;
+}
+
+void HecoContainer::insertCircle(param_type radius)
+{
+    m_shapes.append(circle(radius));
+    m_total += 1;
+}
+
+void HecoContainer::insertTriangle(param_type base, param_type height)
+{
+    m_shapes.append(triangle(base, height));
     m_total += 1;
 }
 

@@ -1,23 +1,49 @@
 #pragma once
 
 #include "../listing22.h"
+#include "SimpleShapeCollectionBase.h"
 
 #include <memory>
 #include <vector>
 
-class ShapeCollection
+class ShapeCollection : public SimpleShapeCollectionBase
 {
 public:
-    ShapeCollection(int seed, u32 shapeCount);
-    param_type TotalArea();
-    param_type TotalAreaAccumulate();
-    param_type TotalAreaParallel();
-#ifdef HAVE_TBB
-    param_type TotalAreaTBB();
-    param_type TotalAreaTBB_test();
-#endif
-    using shape_base_ptr = std::unique_ptr<shape_base>;
-    using ShapeVector = std::vector<shape_base_ptr>;
-private:
-    ShapeVector m_shapes;
+    param_type TotalArea() override;
+    std::string description() override
+    {
+        return "Shape Collection";
+    }
 };
+
+class ShapeCollectionAccumulate : public SimpleShapeCollectionBase
+{
+public:
+    param_type TotalArea() override;
+    std::string description() override
+    {
+        return "Accumulate";
+    }
+};
+
+class ShapeCollectionParallel : public SimpleShapeCollectionBase
+{
+public:
+    param_type TotalArea() override;
+    std::string description() override
+    {
+        return "Shape Collection Parallel";
+    }
+};
+
+#ifdef HAVE_TBB
+class ShapeCollectionTBB : public SimpleShapeCollectionBase
+{
+public:
+    param_type TotalArea() override;
+    std::string description() override
+    {
+        return "Shape Collection TBB";
+    }
+};
+#endif

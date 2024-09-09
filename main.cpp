@@ -104,37 +104,36 @@ int main(int argc, char *argv[])
 
         RawVirtual::deleteShapes(shapes, countShapes);
     }
-    {
-        HighAccuracyCollection shapes;
-        shapes.setup(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes));
-        // printDifference(expectedResult, shapes.TotalArea(), shapes.description());
-        bench.run(shapes.description(), [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
-    }
+
+    std::vector<std::unique_ptr<ShapeCollectionBase>> collections;
+    collections.emplace_back(std::make_unique<HighAccuracyCollection>());
+    collections.emplace_back(std::make_unique<ShapeCollection>());
+    collections.emplace_back(std::make_unique<ShapeCollectionAccumulate>());
+    collections.emplace_back(std::make_unique<ShapeCollectionParallel>());
+#ifdef HAVE_TBB
+    collections.emplace_back(std::make_unique<ShapeCollectionTBB>());
+#endif
     // Doesn't appear to be any more accurate than the above
-    // {
-    //     MultipleAccumulatorCollection shapes;
-    //     shapes.setup(seed, countShapes);
-    //     assert(closeEnough(expectedResult, shapes));
-    //     printDifference(expectedResult, shapes.TotalArea(), shapes.description());
-    //     bench.run(shapes.description(), [&]()
-    //               { doNotOptimizeAway(shapes.TotalArea()); });
-    // }
+    // collections.emplace_back(std::make_unique<MultipleAccumulatorCollection>());
+    collections.emplace_back(std::make_unique<HecoContainer>());
+    collections.emplace_back(std::make_unique<HecoContainerTBB>());
+    collections.emplace_back(std::make_unique<CachedShapeCollection>());
+
+    for (auto& shapes : collections)
     {
-        HecoContainer shapes;
-        shapes.setup(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes));
-        bench.run(shapes.description(), [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
+        assert(shapes);
+        if (!shapes->enabled())
+        {
+            continue;
+        }
+        shapes->setup(seed, countShapes);
+        assert(closeEnough(expectedResult, *shapes));
+        // printDifference(expectedResult, shapes.TotalArea(), shapes.description());
+        bench.run(shapes->description(), [&]()
+                  { doNotOptimizeAway(shapes->TotalArea()); });
+        shapes.reset();
     }
-    {
-        HecoContainerTBB shapes;
-        shapes.setup(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes));
-        bench.run(shapes.description(), [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
-    }
+
     {
         auto shapes = createPolyShapeContainer(seed, countShapes);
 
@@ -210,25 +209,6 @@ int main(int argc, char *argv[])
                   { doNotOptimizeAway(shapes.TotalAreaStruct()); });
     }
     {
-        auto shapes = ShapeCollection(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes.TotalArea()));
-        bench.run("Shape Collection", [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
-        bench.run("Accumulate", [&]()
-                  { doNotOptimizeAway(shapes.TotalAreaAccumulate()); });
-        bench.run("Shape Collection Parallel", [&]()
-                  { doNotOptimizeAway(shapes.TotalAreaParallel()); });
-#ifdef HAVE_TBB
-        assert(closeEnough(expectedResult, shapes.TotalAreaTBB_test()));
-        // bench.run("Shape Collection TBB test", [&]() {
-        //     doNotOptimizeAway(shapes.TotalAreaTBB_test());
-        // });
-        assert(closeEnough(expectedResult, shapes.TotalAreaTBB()));
-        bench.run("Shape Collection TBB", [&]()
-                  { doNotOptimizeAway(shapes.TotalAreaTBB()); });
-#endif
-    }
-    {
         auto shapes = MultiCollection(seed, countShapes);
         assert(closeEnough(expectedResult, shapes.TotalArea()));
         bench.run("MultiCollection", [&]()
@@ -249,11 +229,6 @@ int main(int argc, char *argv[])
     {
         auto shapes = Sorted::SortedCollection(seed, countShapes);
         bench.run("SortedCollection", [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
-    }
-    {
-        auto shapes = CachedShapeCollection(seed, countShapes);
-        bench.run("Cached Collection", [&]()
                   { doNotOptimizeAway(shapes.TotalArea()); });
     }
 

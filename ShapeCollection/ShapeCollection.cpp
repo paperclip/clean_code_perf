@@ -12,24 +12,6 @@
 # include <tbb/parallel_reduce.h>
 #endif
 
-ShapeCollection::ShapeCollection(int seed, u32 shapeCount)
-{
-    Randomizer r{seed};
-
-    m_shapes.reserve(shapeCount);
-    bool print = false;
-    for (auto i=0; i<shapeCount; i++)
-    {
-        shape_base_ptr shape{RawVirtual::createShape(r, print)};
-        assert(shape);
-        m_shapes.emplace_back(std::move(shape));
-        if (i > 10)
-        {
-            print = false;
-        }
-    }
-}
-
 param_type ShapeCollection::TotalArea()
 {
     param_type result = 0.0;
@@ -40,7 +22,7 @@ param_type ShapeCollection::TotalArea()
     return result;    
 }
 
-param_type ShapeCollection::TotalAreaAccumulate()
+param_type ShapeCollectionAccumulate::TotalArea()
 {
     auto area_fold = [](param_type acc, const shape_base_ptr& value)
     {
@@ -49,10 +31,9 @@ param_type ShapeCollection::TotalAreaAccumulate()
     return std::accumulate(m_shapes.cbegin(), m_shapes.cend(), 0.0, area_fold);
 }
 
-param_type ShapeCollection::TotalAreaParallel()
+param_type ShapeCollectionParallel::TotalArea()
 {
-    std::vector<param_type> areas;
-    areas.reserve(m_shapes.size());
+    std::vector<param_type> areas(m_shapes.size());
     auto get_area = [](const shape_base_ptr& value) -> param_type
     {
         return value->Area();
@@ -60,7 +41,11 @@ param_type ShapeCollection::TotalAreaParallel()
     std::transform(std::execution::par_unseq, m_shapes.cbegin(), m_shapes.cend(), areas.begin(),
          get_area);
 
-    return std::accumulate(areas.begin(), areas.end(), 0.0);
+    assert(areas.size() == m_shapes.size());
+
+    auto total = std::accumulate(areas.begin(), areas.end(), 0.0);
+    assert(total != 0);
+    return total;
 }
 
 #ifdef HAVE_TBB
@@ -102,15 +87,7 @@ namespace
     };
 }
 
-param_type ShapeCollection::TotalAreaTBB_test()
-{
-    SumShapes summer{m_shapes};
-    tbb::blocked_range<size_t> range{0, m_shapes.size()};
-    summer(range);
-    return summer.m_result;
-}
-
-param_type ShapeCollection::TotalAreaTBB()
+param_type ShapeCollectionTBB::TotalArea()
 {
     SumShapes summer{m_shapes};
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0,m_shapes.size()), summer);

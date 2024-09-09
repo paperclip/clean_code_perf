@@ -1,26 +1,17 @@
 
 #include "CachedShapeCollection.h"
 
-#include "../raw_virtual.h"
-
-#include <cassert>
-
-CachedShapeCollection::CachedShapeCollection(int seed, u32 shapeCount)
+/**
+ * Add a new shape to the collection
+ */
+void CachedShapeCollection::insert(std::unique_ptr<shape_base>& shape)
 {
-    Randomizer r{seed};
+    m_shapes.push_back(std::move(shape));
+}
 
-    m_shapes.reserve(shapeCount);
-    bool print = false;
-    for (auto i=0; i<shapeCount; i++)
-    {
-        std::unique_ptr<shape_base> shape{RawVirtual::createShape(r, print)};
-        assert(shape);
-        m_shapes.push_back(std::move(shape));
-        if (i > 10)
-        {
-            print = false;
-        }
-    }
+void CachedShapeCollection::reserve(std::size_t n)
+{
+    m_shapes.reserve(n);
 }
 
 param_type CachedShapeCollection::TotalArea()

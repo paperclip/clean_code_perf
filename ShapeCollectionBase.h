@@ -6,9 +6,29 @@
 #include <memory>
 #include <vector>
 
+class IShapeCollection
+{
+    public:
+        // Test method
+        virtual param_type TotalArea() = 0;
+
+        /**
+         * Get a short-description of the test
+         */
+        virtual std::string description() = 0;
+
+        /** 
+         * Override to disable this collection from testing
+         */
+        virtual bool enabled()
+        {
+            return true;
+        }
+};
+
 class Randomizer;
 
-class ShapeCollectionBase
+class ShapeCollectionBase : public IShapeCollection
 {
     public:
         using shape_base_ptr = std::unique_ptr<shape_base>;
@@ -33,21 +53,4 @@ class ShapeCollectionBase
          * Post setup fix up point.
          */
         virtual void postSetup() {};
-
-        
-        // Test method
-        virtual param_type TotalArea() = 0;
-
-        /**
-         * Get a short-description of the test
-         */
-        virtual std::string description() = 0;
-
-        /** 
-         * Override to disable this collection from testing
-         */
-        virtual bool enabled()
-        {
-            return true;
-        }
 };

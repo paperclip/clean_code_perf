@@ -116,8 +116,11 @@ int main(int argc, char *argv[])
     // Doesn't appear to be any more accurate than the above
     // collections.emplace_back(std::make_unique<MultipleAccumulatorCollection>());
     collections.emplace_back(std::make_unique<HecoContainer>());
+#ifdef HAVE_TBB
     collections.emplace_back(std::make_unique<HecoContainerTBB>());
+#endif
     collections.emplace_back(std::make_unique<CachedShapeCollection>());
+    collections.emplace_back(std::make_unique<Sorted::SortedCollection>());
 
     for (auto& shapes : collections)
     {
@@ -226,11 +229,5 @@ int main(int argc, char *argv[])
                   { doNotOptimizeAway(shapes.TotalAreaTbb2()); });
 #endif
     }
-    {
-        auto shapes = Sorted::SortedCollection(seed, countShapes);
-        bench.run("SortedCollection", [&]()
-                  { doNotOptimizeAway(shapes.TotalArea()); });
-    }
-
     return 0;
 }

@@ -10,6 +10,7 @@
 class IShapeCollection
 {
     public:
+        virtual ~IShapeCollection() = default;
         // Test method
         virtual param_type TotalArea() = 0;
 
@@ -36,11 +37,17 @@ class ShapeCollectionBase : public IShapeCollection
         /**
          * Reserve space for n items
          */
-        virtual void reserve(std::size_t n) = 0;
+        virtual void reserve(std::size_t n)
+        {}
+
         /**
          * Add a new shape to the collection
+         * Override this, or the four functions below.
          */
-        virtual void insert(std::unique_ptr<shape_base>& shape) = 0;
+        virtual void insert(std::unique_ptr<shape_base>& shape)
+        {
+            throw std::invalid_argument("insert not implemented");
+        }
 
         virtual void insertSquare(param_type side);
         virtual void insertRectangle(param_type width, param_type height);

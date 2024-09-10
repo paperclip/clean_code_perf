@@ -5,36 +5,30 @@
 
 #include <stdexcept>
 
-VariantCollection::VariantCollection(int seed, u32 shapeCount)
-{
-    Randomizer r{seed};
 
-    m_shapes.reserve(shapeCount);
-    for (auto i = 0; i < shapeCount; i++)
-    {
-        auto t = r.randomShapeType();
-        auto p1 = r.randomParam();
-        switch (t)
-        {
-        case SQUARE:
-            m_shapes.emplace_back(square{p1});
-            break;
-        case RECTANGLE:
-            m_shapes.emplace_back(rectangle{p1, r.randomParam()});
-            break;
-        case TRIANGLE:
-            m_shapes.emplace_back(triangle{p1, r.randomParam()});
-            break;
-        case CIRCLE:
-            m_shapes.emplace_back(circle{p1});
-            break;
-        default:
-            throw std::invalid_argument("Bad random shape");
-        }
-    }
+void VariantCollection::reserve(std::size_t n)
+{
+    m_shapes.reserve(n);
 }
 
-param_type VariantCollection::TotalAreaLambda()
+void VariantCollection::insertSquare(param_type side)
+{
+    m_shapes.emplace_back(square{side});
+}
+void VariantCollection::insertRectangle(param_type width, param_type height)
+{
+    m_shapes.emplace_back(rectangle{width, height});
+}
+void VariantCollection::insertCircle(param_type radius)
+{
+    m_shapes.emplace_back(circle{radius});
+}
+void VariantCollection::insertTriangle(param_type base, param_type height)
+{
+    m_shapes.emplace_back(triangle{base, height});
+}
+
+param_type VariantCollectionLambda::TotalArea()
 {
     param_type result = 0.0;
     for (const auto &shape : m_shapes)
@@ -56,11 +50,20 @@ namespace
             total_ += in.Area();
         }
     };
+
+    template <class V>
+    void visit(V&& visitor, const VariantCollection::ShapeVector& shapes)
+    {
+        for (const auto& object : shapes)
+        {
+            std::visit(visitor, object);
+        }
+    }
 }
 
-param_type VariantCollection::TotalAreaStruct()
+param_type VariantCollectionStruct::TotalArea()
 {
     Summer summer;
-    visit(summer);
+    visit(summer, m_shapes);
     return summer.total_;
 }

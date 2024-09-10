@@ -3,6 +3,7 @@
 #include "listing24.h"
 #include "CachedShapeCollection/CachedShapeCollection.h"
 #include "CachedShapeCollection/PreCalcCollection.h"
+#include "CachedShapeCollection/IncrementalCalcCollection.h"
 #include "RawVectorShapes/VectorShapes.h"
 #include "ShapeCollection/ShapeCollection.h"
 #include "Switch/listing25.h"
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
     collections.emplace_back(std::make_unique<Sorted::SortedCollection>());
     collections.emplace_back(std::make_unique<CachedShapeCollection>());
     collections.emplace_back(std::make_unique<PreCalcCollection>());
+    collections.emplace_back(std::make_unique<IncrementalCalcCollection>());
+    collections.emplace_back(std::make_unique<VariantCollectionLambda>());
+    collections.emplace_back(std::make_unique<VariantCollectionStruct>());
 
     {
         auto shapes = RawVirtual::createShapes(seed, countShapes);
@@ -223,15 +227,6 @@ int main(int argc, char *argv[])
         auto shapes = UniqueVector::create(seed, countShapes);
         bench.run("UniqueVector", [&]()
                   { doNotOptimizeAway(UniqueVector::TotalArea(shapes)); });
-    }
-    {
-        auto shapes = VariantCollection(seed, countShapes);
-        assert(closeEnough(expectedResult, shapes.TotalAreaLambda(), " (VariantLambda)"));
-        bench.run("Variant Lambda", [&]()
-                  { doNotOptimizeAway(shapes.TotalAreaLambda()); });
-        assert(closeEnough(expectedResult, shapes.TotalAreaStruct(), " (VariantStruct)"));
-        bench.run("Variant Struct", [&]()
-                  { doNotOptimizeAway(shapes.TotalAreaStruct()); });
     }
     {
         auto shapes = MultiCollection(seed, countShapes);

@@ -1,28 +1,53 @@
 #pragma once
 
-#include "../listing22.h"
+#include "../ShapeCollectionBase.h"
 
 #include <memory>
 #include <vector>
 #include <variant>
 
-class VariantCollection
+class VariantCollection : public ShapeCollectionBase
 {
 public:
-    VariantCollection(int seed, u32 shapeCount);
-    param_type TotalAreaLambda();
-    param_type TotalAreaStruct();
-private:
     using VariantShape = std::variant<square,rectangle,triangle,circle>;
     using ShapeVector = std::vector<VariantShape>;
-    ShapeVector m_shapes;
 
-    template <class V>
-    void visit(V&& visitor)
-    {
-        for (const auto& object : m_shapes)
-        {
-            std::visit(visitor, object);
-        }
-    }
+
+    /**
+     * Reserve space for n items
+     */
+    void reserve(std::size_t n) override;
+
+    void insertSquare(param_type side) override;
+    void insertRectangle(param_type width, param_type height) override;
+    void insertCircle(param_type radius) override;
+    void insertTriangle(param_type base, param_type height) override;
+
+protected:
+    ShapeVector m_shapes;
 };
+
+class VariantCollectionLambda : public VariantCollection
+{
+    public:
+        param_type TotalArea() override;
+
+        std::string description()
+        {
+            return "Variant Lambda";
+        }
+};
+
+
+class VariantCollectionStruct : public VariantCollection
+{
+    public:
+        param_type TotalArea() override;
+
+        std::string description()
+        {
+            return "Variant Struct";
+        }
+};
+
+

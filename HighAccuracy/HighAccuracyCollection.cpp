@@ -2,6 +2,7 @@
 #include "HighAccuracyCollection.h"
 
 #include <algorithm>
+#include <cassert>
 
 void HighAccuracyCollection::reserve(std::size_t n)
 {
@@ -21,6 +22,8 @@ namespace
     using shape_base_ptr = HighAccuracyCollection::shape_base_ptr;
     bool compareShapes(const shape_base_ptr& first, const shape_base_ptr& second)
     {
+        assert(first);
+        assert(second);
         return first->Area() < second->Area();
     }
 }

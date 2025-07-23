@@ -1,6 +1,8 @@
 
 #include "HighAccuracyCollection.h"
 
+#include <algorithm>
+
 void HighAccuracyCollection::reserve(std::size_t n)
 {
     m_shapes.reserve(n);

@@ -18,6 +18,7 @@
 #include "HighAccuracy/HighAccuracyCollection.h"
 #include "HighAccuracy/MultipleAccumulatorCollection.h"
 #include "heco/HecoContainer.h"
+#include "UTL/UtlCollection.h"
 
 
 #include "nanobench.h"
@@ -27,6 +28,7 @@
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
+#include <optional>
 
 namespace
 {
@@ -52,8 +54,22 @@ namespace
                 << " relativeDiff=" << relativeDiff << '\n';
         return false;
     }
+    bool closeEnough(std::optional<double>& expectedResult, double actualResult, const std::string &note = "")
+    {
+        if (!expectedResult)
+        {
+            expectedResult = actualResult;
+            return true;
+        }
+        return closeEnough(expectedResult.value(), actualResult, note);
+    }
 
     bool closeEnough(double expectedResult, ShapeCollectionBase& actual)
+    {
+        return closeEnough(expectedResult, actual.TotalArea(), actual.description());
+    }
+
+    bool closeEnough(std::optional<double>& expectedResult, ShapeCollectionBase& actual)
     {
         return closeEnough(expectedResult, actual.TotalArea(), actual.description());
     }
@@ -86,28 +102,13 @@ int main(int argc, char *argv[])
     bench.minEpochIterations(50);
     bench.relative(true);
 
-    param_type expectedResult = 0.0;
-
-    {
-        auto shapes = RawVirtual::createShapes(seed, countShapes);
-        expectedResult = TotalAreaVTBL::TotalArea(countShapes, shapes);
-        // std::cerr << "Expected result=" << expectedResult << '\n';
-
-        bench.run("TotalAreaVTBL", [&]()
-                  { doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes)); });
-
-        auto vtbl4Result = TotalAreaVTBL4::TotalArea(countShapes, shapes);
-        // std::cerr << "TotalAreaVTBL4::TotalArea(countShapes, shapes) = " << vtbl4Result << '\n';
-        // std::cerr << "Diff = " << (expectedResult - vtbl4Result) << '\n';
-        assert(closeEnough(expectedResult, vtbl4Result));
-        bench.run("TotalAreaVTBL4", [&]()
-                  { doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes)); });
-
-        RawVirtual::deleteShapes(shapes, countShapes);
-    }
+    auto highAccuracyCollection = std::make_unique<HighAccuracyCollection>();
+    highAccuracyCollection->setup(seed, countShapes);
+    std::optional<double> expectedResult = highAccuracyCollection->TotalArea();
 
     std::vector<std::unique_ptr<ShapeCollectionBase>> collections;
     collections.emplace_back(std::make_unique<HighAccuracyCollection>());
+    collections.emplace_back(std::make_unique<UtlShapeCollection>());
     collections.emplace_back(std::make_unique<ShapeCollection>());
     collections.emplace_back(std::make_unique<ShapeCollectionAccumulate>());
     collections.emplace_back(std::make_unique<ShapeCollectionParallel>());
@@ -123,6 +124,25 @@ int main(int argc, char *argv[])
     collections.emplace_back(std::make_unique<Sorted::SortedCollection>());
     collections.emplace_back(std::make_unique<CachedShapeCollection>());
     collections.emplace_back(std::make_unique<PreCalcCollection>());
+
+    {
+        auto shapes = RawVirtual::createShapes(seed, countShapes);
+        auto vtblResult = TotalAreaVTBL::TotalArea(countShapes, shapes);
+        assert(closeEnough(expectedResult, vtblResult));
+        // std::cerr << "Expected result=" << expectedResult << '\n';
+
+        bench.run("TotalAreaVTBL", [&]()
+                  { doNotOptimizeAway(TotalAreaVTBL::TotalArea(countShapes, shapes)); });
+
+        auto vtbl4Result = TotalAreaVTBL4::TotalArea(countShapes, shapes);
+        // std::cerr << "TotalAreaVTBL4::TotalArea(countShapes, shapes) = " << vtbl4Result << '\n';
+        // std::cerr << "Diff = " << (expectedResult - vtbl4Result) << '\n';
+        assert(closeEnough(expectedResult, vtbl4Result));
+        bench.run("TotalAreaVTBL4", [&]()
+                  { doNotOptimizeAway(TotalAreaVTBL4::TotalArea(countShapes, shapes)); });
+
+        RawVirtual::deleteShapes(shapes, countShapes);
+    }
 
     for (auto& shapes : collections)
     {

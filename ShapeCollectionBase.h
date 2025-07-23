@@ -4,6 +4,7 @@
 #include "listing22.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 class IShapeCollection

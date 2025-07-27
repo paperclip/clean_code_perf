@@ -11,6 +11,9 @@ FLAGS := -march=native -DSFMT_MEXP=19937 -g -O3
 %.o : %.cpp
 	g++ $(FLAGS) -c $< -o $@ -std=c++20 -IPolyCollection
 
+DataFrame/DataFrameCollection.o : DataFrame/DataFrameCollection.cpp
+	g++ $(FLAGS) -c $< -o $@ -std=c++23 -IDataFrame/include
+
 main.o : main.cpp $(headers)
 
 %.o : %.c

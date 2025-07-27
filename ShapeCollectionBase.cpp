@@ -31,23 +31,28 @@ void ShapeCollectionBase::insertTriangle(param_type base, param_type height)
     insert(shape);
 }
 
-void ShapeCollectionBase::insertRandomShape(Randomizer& r)
+void ShapeCollectionBase::setup(int seed, u32 shapeCount)
+{
+    setupWithShapes(*this, seed, shapeCount);
+}
+
+static void insertRandomShape(ISetupShapes& setup, Randomizer& r)
 {
     const auto t = r.randomShapeType();
     const auto p1 = r.randomParam();
     switch(t)
     {
         case SQUARE:
-            insertSquare(p1);
+            setup.insertSquare(p1);
             break;
         case RECTANGLE:
-            insertRectangle(p1, r.randomParam());
+            setup.insertRectangle(p1, r.randomParam());
             break;
         case TRIANGLE:
-            insertTriangle(p1, r.randomParam());
+            setup.insertTriangle(p1, r.randomParam());
             break;
         case CIRCLE:
-            insertCircle(p1);
+            setup.insertCircle(p1);
             break;
         default:
             std::cerr << "Bad random shape! " << t << '\n';
@@ -55,14 +60,54 @@ void ShapeCollectionBase::insertRandomShape(Randomizer& r)
     }
 }
 
-void ShapeCollectionBase::setup(int seed, u32 shapeCount)
+namespace
+{
+    class SetupAdapter : public virtual ISetupShapes
+    {
+        public:
+            SetupAdapter(ISetupShapeBase& setup) : m_setup(setup)
+            {}
+            void insertSquare(param_type side) override
+            {
+                shape_base_ptr shape = std::make_unique<square>(side);
+                m_setup.insert(shape);
+            }
+            void insertRectangle(param_type width, param_type height) override
+            {
+                shape_base_ptr shape = std::make_unique<rectangle>(width, height);
+                m_setup.insert(shape);
+            }
+            void insertCircle(param_type radius) override
+            {
+                shape_base_ptr shape = std::make_unique<circle>(radius);
+                m_setup.insert(shape);
+            }
+            void insertTriangle(param_type base, param_type height) override
+            {
+                shape_base_ptr shape = std::make_unique<triangle>(base, height);
+                m_setup.insert(shape);
+            }
+
+        private:
+            ISetupShapeBase& m_setup;
+    };
+}
+
+void setupWithShapeBase(ISetupShapeBase& setup, int seed, u32 shapeCount)
+{
+    SetupAdapter adapter{setup};
+    setupWithShapes(adapter, seed, shapeCount);
+}
+
+void setupWithShapes(ISetupShapes& setup, int seed, u32 shapeCount)
 {
     Randomizer r{seed};
 
-    reserve(shapeCount);
+    setup.reserve(shapeCount);
     for (auto i=0; i<shapeCount; i++)
     {
-        insertRandomShape(r);
+        insertRandomShape(setup, r);
     }
-    postSetup();
+    setup.postSetup();
+    
 }
